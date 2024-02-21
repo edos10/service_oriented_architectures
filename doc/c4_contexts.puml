@@ -1,0 +1,21 @@
+@startuml context
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+!define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
+!include DEVICONS/react.puml
+!include DEVICONS/postgresql.puml
+!include DEVICONS/python.puml
+!include DEVICONS/go.puml
+!include DEVICONS/redis.puml
+!include <cloudinsight/kafka>
+
+title Взаимодействие пользователя с системой
+Person(user1, "Пользователь N", "Пользователь")
+Container(system, "Соцсеть")
+Rel(user1, system, "Просматривает посты")
+Rel(user1, system, "Лайкает посты")
+Rel(user1, system, "Регистрируется в соцсети")
+Rel(user1, system, "Создает новый пост")
+Rel(user1, system, "Комментирует пост")
+@enduml
