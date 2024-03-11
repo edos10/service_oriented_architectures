@@ -1,0 +1,33 @@
+@startuml containers
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+!define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
+!include DEVICONS/react.puml
+!include DEVICONS/postgresql.puml
+!include DEVICONS/python.puml
+!include DEVICONS/go.puml
+!include DEVICONS/redis.puml
+!include <cloudinsight/kafka>
+
+title Архитектура соцсети
+Person(user, "Пользователь", "Отправляет запросы неявно, пользуясь фронтом")
+Container(frontend, "Фронтенд", "React", "Интерфейс для пользователя", "react")
+Container(main_api, "Главный сервис", "Python/FastAPI", "Главный сервис, который отвечает за клиентское API и за регистрацию и аутентификацию пользователей", "python")
+Container(posts_service, "Сервис постов и комментариев", "Golang/go-gin", "Сервис, который отвечает за хранение и работу с постами и комментариями", "go")
+Container(stat_service, "Сервис статистики", "Go/go-gin", "Сервис статистики для подсчета лайков и просмотров", "go")
+ContainerQueue(view_topic, "views/likes topic", "kafka", "Хранит события о просмотрах и лайках пользователей", "kafka")
+ContainerDb(db_main, "БД для главного сервиса", "Postgres", "Xранит пользователей, их данные, а также авторизационные данные", "postgresql")
+ContainerDb(db_token, "БД для хранения аутентификационных данных", "Redis", "Xранит токены авторизации", "redis")
+ContainerDb(db_stat, "БД для сервиса статистики", "Clickhouse", "Хранит данные о лайках и просмотрах постов, их статистику", "clickhouse")
+ContainerDb(db_posts, "БД для сервиса постов и комментариев", "Postgres", "Хранит данные о постах и комментариях", "postgresql")
+Rel(user, frontend, "Пользуется соцсетью", "REST")
+Rel(frontend, main_api, "Запросы из веб-приложения на сервер", "REST")
+Rel(main_api, posts_service, "Обновляет данные по постам", "gRPC")
+Rel(main_api, view_topic, "Отправляет события по лайкам/просмотрам в брокер")
+Rel(view_topic, stat_service, "Принимает события по просмотрам/лайкам")
+Rel(stat_service, db_stat, "Отдает события по просмотрам/лайкам")
+Rel(main_api, db_main, "Обрабатывает и обновляет данные пользователей")
+Rel(main_api, db_token, "Проверяет токены аутентификации для авторизации пользователей")
+Rel(main_api, stat_service, "Получает статистику по сервисам", "gRPC")
+@enduml
