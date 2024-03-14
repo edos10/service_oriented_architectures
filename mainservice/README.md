@@ -9,7 +9,7 @@
 docker-compose build
 docker-compose up
 ```
-2) затем то же самое в папке sev/services-dev
+2) затем то же самое в папке dev/services-dev
 ```bash
 docker-compose build
 docker-compose up
