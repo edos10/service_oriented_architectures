@@ -1,0 +1,29 @@
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+        http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+
+    <changeSet author="e.ryabov" id="create-users-table">
+        <createTable tableName="users" remarks="Храним пользователей в users">
+            <column name="id" type="SERIAL" remarks="Идентификатор пользователя">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="token" type="VARCHAR(30)" remarks="Токен юзера">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="end_time" type="TIMESTAMP" remarks="Время окончания действия токена юзера">
+                <constraints nullable="false"/>
+            </column>
+
+        </createTable>
+    </changeSet>
+    
+    
+</databaseChangeLog>
