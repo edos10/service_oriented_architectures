@@ -19,27 +19,22 @@
             </column>
 
             <column name="password" type="VARCHAR(50)" remarks="Хеш пароля юзера">
-                <constraints nullable="falseа"/>
+                <constraints nullable="false"/>
             </column>
 
             <column name="email" type="VARCHAR(50)" remarks="Почта юзера">
-                <constraints nullable="false"/>
             </column>
 
             <column name="name" type="VARCHAR(60)" remarks="Имя юзера">
-                <constraints nullable="false"/>
             </column>
 
             <column name="surname" type="VARCHAR(80)" remarks="Фамилия юзера">
-                <constraints nullable="false"/>
             </column>
 
-            <column name="number_phone" type="VARCHAR(15)" remarks="Номер телефона юзера">
-                <constraints nullable="false"/>
+            <column name="phone_number" type="VARCHAR(15)" remarks="Номер телефона юзера">
             </column>
 
             <column name="birth_date" type="DATE" remarks="Дата рождения юзера">
-                <constraints nullable="false"/>
             </column>
 
         </createTable>

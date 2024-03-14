@@ -3,14 +3,15 @@ from fastapi.responses import JSONResponse
 from src.usecase.usecase import *
 from src.repo.repository import Repository
 from src.usecase.password import gen_token
+from src.models.models import *
 
 import json
 
 main_router = APIRouter()
 
 
-@main_router.post('/register')
-async def register_new_user(request: Request):
+@main_router.post('/register', response_model=ResponseRegister, status_code=201)
+async def register_new_user(request: Request, _: NewUser):
     input_data = await request.body()
     if not input_data:
         return JSONResponse(content={"message": "invalid input data"}, status_code=400)
@@ -22,7 +23,7 @@ async def register_new_user(request: Request):
         raise HTTPException(400, {"message": str(e)})
 
     if new_id <= 0:
-        raise HTTPException(400, {"message": "error in create user"})
+        raise HTTPException(500, {"message": "error in create user"})
 
     token = gen_token()
     await add_token(new_id, token)
@@ -30,8 +31,8 @@ async def register_new_user(request: Request):
     return JSONResponse(content={"token": token}, status_code=200)
 
 
-@main_router.post("/auth")
-async def auth_user(request: Request):
+@main_router.post("/auth", response_model=ResponseAuth, status_code=201)
+async def auth_user(request: Request, _: AuthUser):
     input_data = await request.body()
     if not input_data:
         return JSONResponse(content={"message": "invalid input data"}, status_code=400)
@@ -55,14 +56,15 @@ async def auth_user(request: Request):
     return JSONResponse(content={"token": token}, status_code=200)
 
 
-@main_router.get('/get')
+# данный метод создан для тестирования правильности работы системы
+@main_router.get('/get', response_model=list[NewUser], status_code=200)
 async def get_users():
     values = await Repository().get_users()
     return values
 
 
-@main_router.patch("/update")
-async def update_data_user(request: Request):
+@main_router.put("/update", response_model=ResponseUpdate, status_code=200)
+async def update_data_user(request: Request, _: UpdateUser):
     input_data = await request.body()
     if not input_data:
         return JSONResponse(content={"message": "no data for update"}, status_code=400)
@@ -70,6 +72,6 @@ async def update_data_user(request: Request):
     try:
         await update_user(data_input)
     except ValueError as e:
-        raise HTTPException(400, {"message": str(e)})
+        raise HTTPException(401, {"message": str(e)})
 
     return JSONResponse(content={"message": "data succesfully updated"}, status_code=200)

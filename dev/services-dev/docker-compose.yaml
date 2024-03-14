@@ -5,7 +5,7 @@ services:
     container_name: "main_service"
     restart: unless-stopped
     build:
-      context: ./../../main_service/src
+      context: ./../../mainservice
       dockerfile: Dockerfile
     ports:
       - "5000:5000"

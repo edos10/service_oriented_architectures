@@ -7,7 +7,7 @@ import datetime
 
 async def add_new_user(data: dict) -> int:
     unfill = []
-    for i in ["nickname", "password", "email", "birth_date", "phone_number", "name", "surname"]:
+    for i in ["nickname", "password"]:
         if i not in data:
             unfill.append(i)
     if unfill:
@@ -22,7 +22,6 @@ async def check_auth_user(login: str, password: str) -> bool:
     if not await check_user(login):
         raise ValueError("this user doesn't exists")
     hash_p = await Repository().ret_auth_data(login)
-    print(hash_p[0]['password'], password)
     bytes_hash = bytes(hash_p[0]['password'], encoding='utf-8')
     return hash_p[0]['password'] == password
      
