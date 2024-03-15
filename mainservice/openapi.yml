@@ -1,0 +1,300 @@
+openapi: 3.1.0
+info:
+  title: FastAPI
+  version: 0.1.0
+paths:
+  /register:
+    post:
+      summary: Register New User
+      operationId: register_new_user_register_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewUser'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseRegister'
+        '400':
+          description: Bad request, errors in data
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+        '500':
+          description: Error in create user
+  /auth:
+    post:
+      summary: Auth User
+      operationId: auth_user_auth_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthUser'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseAuth'
+        '400':
+          description: Bad request, errors in data
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /get:
+    get:
+      summary: Get Users
+      operationId: get_users_get_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/NewUser'
+                type: array
+                title: Response Get Users Get Get
+  /update:
+    put:
+      summary: Update Data User
+      operationId: update_data_user_update_put
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUser'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseUpdate'
+        '401':
+          description: User unauthorized or otken invalid or ended
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    AuthUser:
+      properties:
+        nickname:
+          type: string
+          title: Nickname
+        password:
+          type: string
+          title: Password
+      type: object
+      required:
+        - nickname
+        - password
+      title: AuthUser
+      examples:
+        - nickname: Foo
+          password: '309230'
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    NewUser:
+      properties:
+        nickname:
+          type: string
+          title: Nickname
+        password:
+          type: string
+          title: Password
+        name:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Name
+        surname:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Surname
+        email:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Email
+        birth_date:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Birth Date
+        phone_number:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Phone Number
+      type: object
+      required:
+        - nickname
+        - password
+        - name
+        - surname
+        - email
+        - birth_date
+        - phone_number
+      title: NewUser
+      examples:
+        - birth_date: '2005-12-31'
+          email: 'ivan@mail.ru'
+          name: 'Ivan'
+          nickname: 'Foo'
+          password: '309230'
+          phone_number: '79998887766'
+          surname: 'Ivanov'
+        - nickname: 'Foo'
+          password: '309230'
+    ResponseAuth:
+      properties:
+        token:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Token
+        message:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Message
+      type: object
+      required:
+        - token
+        - message
+      title: ResponseAuth
+      examples:
+        - token: f34rgFN4J40okplLP0
+        - message: wrong password, try again!
+        - message: this user doesn't exists!
+    ResponseRegister:
+      properties:
+        token:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Token
+        message:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Message
+      type: object
+      required:
+        - token
+        - message
+      title: ResponseRegister
+      examples:
+        - token: f34rgFN4J40okplLP0
+        - message: not enough data for register
+    ResponseUpdate:
+      properties:
+        token:
+          type: string
+          title: Token
+      type: object
+      required:
+        - token
+      title: ResponseUpdate
+      examples:
+        - message: data succesfully updated
+        - message: data didn't update
+        - message: this user doesn't exists!
+        - message: life-time of token ended, try auth again!
+    UpdateUser:
+      properties:
+        token:
+          type: string
+          title: Token
+        name:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Name
+        surname:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Surname
+        email:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Email
+        birth_date:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Birth Date
+        phone_number:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Phone Number
+      type: object
+      required:
+        - token
+        - name
+        - surname
+        - email
+        - birth_date
+        - phone_number
+      title: UpdateUser
+      examples:
+        - birth_date: '2005-12-31'
+          email: 'ivan@mail.ru'
+          name: 'Ivan'
+          phone_number: '79998887766'
+          surname: 'Ivanov'
+          token: 'f34rgFN4J40okplLP0'
+        - email: 'ivan@mail.ru'
+          token: 'f34rgFN4J40okplLP0'
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+              - type: string
+              - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+      type: object
+      required:
+        - loc
+        - msg
+        - type
+      title: ValidationError
