@@ -6,13 +6,13 @@
 
 1) сначала поднимаем БД в папке dev/database-dev командой 
 ```bash
-docker compose build
-docker compose up
+docker-compose build
+docker-compose up
 ```
-2) затем то же самое в папке sev/services-dev
+2) затем то же самое в папке dev/services-dev
 ```bash
-docker compose build
-docker compose up
+docker-compose build
+docker-compose up
 ```
 3) и наконец заходим в папку mainservice и делаем миграции:
 ```bash
