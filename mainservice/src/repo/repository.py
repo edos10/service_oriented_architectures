@@ -15,14 +15,16 @@ class Repository:
         conn = await connection_start()
         value = await conn.fetch(f"SELECT id FROM users WHERE nickname='{nick}'")
         await conn.close()
+        if len(value) == 0:
+            return -1
         return value[0]['id']
 
     async def get_user_token(self, token: str) -> int:
         conn = await connection_start()
-        print(f"SELECT id FROM tokens WHERE token='{token}'")
         value = await conn.fetch(f"SELECT id FROM tokens WHERE token='{token}'")
-        print(value)
         await conn.close()
+        if len(value) == 0:
+            return -1
         return value[0]['id']
 
     async def check_user(self, nick: str) -> bool:
@@ -48,7 +50,9 @@ class Repository:
                                       '{data['phone_number']}', 
                                       '{data['name']}',
                                       '{data['surname']}', 
-                                      '{data['birth_date']}'
+                                      CASE WHEN ('{data['birth_date']}' <> '') IS FALSE THEN CAST(NULL as DATE)
+										  ELSE '{data['birth_date'] or '2002-10-05'}'
+									  END
                                       ) RETURNING id""")
         await conn.close()
         return new_id[0]['id']

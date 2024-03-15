@@ -2,7 +2,15 @@ from src.repo.repository import *
 from src.usecase.password import check_password
 from collections import defaultdict
 
-import datetime
+import datetime, time
+
+
+async def preprocess_date(date: str) -> bool:
+    try:
+       x = time.strptime(date, '%Y-%m-%d')
+    except ValueError:
+        return False
+    return True
 
 
 async def add_new_user(data: dict) -> int:
@@ -12,9 +20,17 @@ async def add_new_user(data: dict) -> int:
             unfill.append(i)
     if unfill:
         raise ValueError(f"not enough fields in data for register, you need to fill: {', '.join(unfill)}") 
+    
     exists = await check_user(data['nickname'])
     if exists:
         raise ValueError("this user already exists!")
+    
+    if 'birth_date' in data and not await preprocess_date(data['birth_date']):
+        raise ValueError("wrong birth date!")
+    
+    if len(data['password']) <= 5:
+        raise ValueError("very low length of passsword, try minimum 6 symbols!")
+
     return await Repository().add_user(defaultdict(str, data))
 
 
@@ -56,7 +72,14 @@ async def update_user(data: defaultdict):
         if i in ["nickname", "password"]:
             raise ValueError("such fields are unavailable for updating")
 
+    if 'birth_date' in data and not await preprocess_date(data['birth_date']):
+        raise ValueError("wrong birth date!")
+
     id_user = await Repository().get_user_token(data["token"])
+
+    if id_user <= 0:
+        raise ValueError("such token doesn't exists")
+
     if not await Repository().check_current_token(data["token"], id_user):
         raise ValueError("life-time of token ended, try auth again!")
     await Repository().update_user(id_user, data)

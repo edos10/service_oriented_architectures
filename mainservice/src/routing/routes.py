@@ -10,7 +10,7 @@ import json
 main_router = APIRouter()
 
 
-@main_router.post('/register', response_model=ResponseRegister, status_code=201)
+@main_router.post('/register', status_code=201)
 async def register_new_user(request: Request, _: NewUser):
     input_data = await request.body()
     if not input_data:
@@ -31,7 +31,7 @@ async def register_new_user(request: Request, _: NewUser):
     return JSONResponse(content={"token": token}, status_code=200)
 
 
-@main_router.post("/auth", response_model=ResponseAuth, status_code=201)
+@main_router.post("/auth", status_code=201)
 async def auth_user(request: Request, _: AuthUser):
     input_data = await request.body()
     if not input_data:
@@ -57,13 +57,13 @@ async def auth_user(request: Request, _: AuthUser):
 
 
 # данный метод создан для тестирования правильности работы системы
-@main_router.get('/get', response_model=list[NewUser], status_code=200)
+@main_router.get('/get', status_code=200)
 async def get_users():
     values = await Repository().get_users()
     return values
 
 
-@main_router.put("/update", response_model=ResponseUpdate, status_code=200)
+@main_router.put("/update", status_code=200)
 async def update_data_user(request: Request, _: UpdateUser):
     input_data = await request.body()
     if not input_data:

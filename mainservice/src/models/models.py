@@ -2,13 +2,6 @@ from pydantic import BaseModel
 from datetime import datetime
 
 class NewUser(BaseModel):
-     nickname: str
-     password: str
-     name: str | None
-     surname: str | None
-     email: str | None
-     birth_date: str | None
-     phone_number: str | None
 
      model_config = {
         "json_schema_extra": {
@@ -48,11 +41,6 @@ class AuthUser(BaseModel):
     
 class UpdateUser(BaseModel):
      token: str
-     name: str | None
-     surname: str | None
-     email: str | None
-     birth_date: str | None
-     phone_number: str | None
      
      model_config = {
         "json_schema_extra": {
