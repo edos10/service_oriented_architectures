@@ -51,7 +51,7 @@ async def change_data_user(new_data: dict):
 
 
 async def add_token(user_id: int, token: str):
-    time_for_end = datetime.datetime.now() + datetime.timedelta(seconds=40)
+    time_for_end = datetime.datetime.now() + datetime.timedelta(seconds=180)
     await Repository().new_token(token, user_id, time_for_end)
 
 

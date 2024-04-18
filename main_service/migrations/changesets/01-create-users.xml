@@ -1,0 +1,49 @@
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+        http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+
+    <changeSet author="e.ryabov" id="create-users-table">
+        <createTable tableName="users" remarks="Храним пользователей в users">
+            <column name="id" type="SERIAL" remarks="Идентификатор пользователя">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="users_pkey"/>
+            </column>
+
+            <column name="login" type="VARCHAR(50)" remarks="Никнейм юзера">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="password" type="VARCHAR(50)" remarks="Хеш пароля юзера">
+                <constraints nullable="falseа"/>
+            </column>
+
+            <column name="email" type="VARCHAR(50)" remarks="Почта юзера">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="name" type="VARCHAR(60)" remarks="Имя юзера">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="surname" type="VARCHAR(80)" remarks="Фамилия юзера">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="number_phone" type="VARCHAR(15)" remarks="Номер телефона юзера">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="birth_date" type="DATE" remarks="Дата рождения юзера">
+                <constraints nullable="false"/>
+            </column>
+
+        </createTable>
+    </changeSet>
+    
+    
+</databaseChangeLog>
