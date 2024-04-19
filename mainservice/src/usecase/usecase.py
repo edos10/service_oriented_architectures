@@ -21,7 +21,11 @@ async def add_new_user(data: dict) -> int:
     if unfill:
         raise ValueError(f"not enough fields in data for register, you need to fill: {', '.join(unfill)}") 
     
+    if len(data['nickname']) <= 4:
+        raise ValueError("very low length of your nickname, please try again with length > 4")
+
     exists = await check_user(data['nickname'])
+
     if exists:
         raise ValueError("this user already exists!")
     
@@ -51,7 +55,7 @@ async def change_data_user(new_data: dict):
 
 
 async def add_token(user_id: int, token: str):
-    time_for_end = datetime.datetime.now() + datetime.timedelta(seconds=40)
+    time_for_end = datetime.datetime.now() + datetime.timedelta(seconds=180)
     await Repository().new_token(token, user_id, time_for_end)
 
 
