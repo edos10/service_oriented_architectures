@@ -6,7 +6,6 @@ from src.usecase.password import gen_token
 from src.models.models import *
 from google.protobuf.json_format import MessageToJson
 import grpc
-from src.proto.posts_service_pb2_grpc import PostServiceStub
 from src.proto import posts_service_pb2
 from src.usecase.grpc import grpc_connect
 
@@ -51,11 +50,6 @@ async def create_post(request: Request):
             'post_time': response.Post_time
         }, status_code=201)
     except grpc.RpcError as e:
-        msg = e.details()
-        if e.code() == grpc.StatusCode.PERMISSION_DENIED:
-            msg = "access to thid post denied!"
-        elif e.code() == grpc.StatusCode.INTERNAL:
-            msg = "error in grpc service"
         return JSONResponse({"message": e.details()}, status_code=400)
 
 
@@ -78,13 +72,16 @@ async def delete_post(request: Request, post_id: int):
     try:
         client = await grpc_connect()
         client.DeletePost(
-            posts_service_pb2.DeletePostRequest(Post_id=post_id))
-        return JSONResponse({
-            "message": f"post with id = {post_id} was deleted successfully"
-        }, status_code=204)
+            posts_service_pb2.DeletePostRequest(Post_id=post_id,
+                                                User_id=get_id))
+        return JSONResponse(content={}, status_code=204)
     except grpc.RpcError as e:
-        return JSONResponse({"message": e.details()}, status_code=400)
-
+        msg = e.details()
+        if e.code() == grpc.StatusCode.PERMISSION_DENIED:
+            msg = "access to thid post denied!"
+        elif e.code() == grpc.StatusCode.INTERNAL:
+            msg = "error in grpc service"
+        return JSONResponse({"message": msg}, status_code=400)
 
 
 @post_router.put("/update_post/{post_id}", status_code=200)
@@ -123,9 +120,12 @@ async def update_post_user(request: Request, post_id: int):
         }, status_code=200)
     
     except grpc.RpcError as e:
-        status_code = e.code()
-        print(status_code)
-        return JSONResponse({"message": e.details()}, status_code=400)
+        msg = e.details()
+        if e.code() == grpc.StatusCode.PERMISSION_DENIED:
+            msg = "access to thid post denied!"
+        elif e.code() == grpc.StatusCode.INTERNAL:
+            msg = "error in grpc service"
+        return JSONResponse({"message": msg}, status_code=400)
 
 @post_router.get("/get_post/{post_id}", status_code=200)
 async def get_post_on_id(request: Request, post_id: int):

@@ -29,6 +29,7 @@ message UpdatePostRequest {
 
 message DeletePostRequest {
     int64 Post_id = 1;
+    int64 User_id = 2;
 }
 
 message DeletePostResponse {

@@ -103,19 +103,29 @@ func (s *GrpcServer) UpdatePost(ctx context.Context, r *proto.UpdatePostRequest)
 }
 
 func (s *GrpcServer) DeletePost(ctx context.Context, req *proto.DeletePostRequest) (*proto.DeletePostResponse, error) {
-	var postId int64
-	err := s.Db.QueryRowContext(ctx, `DELETE FROM posts WHERE id = $1 RETURNING id`,
-		req.PostId).Scan(&postId)
+	resExists, errEx := s.Db.ExecContext(ctx, `SELECT * FROM posts WHERE id = $1 AND user_id = $2`,
+		req.PostId, req.UserId)
+	if errEx != nil {
+		return nil, status.Errorf(codes.NotFound, "unable find post: %v", errEx)
+	}
+
+	rowsAffected, err := resExists.RowsAffected()
 	if err != nil {
-		return nil, status.Errorf(codes.NotFound, "unable delete post: %v", err)
+		return nil, status.Errorf(codes.Internal, "errot in selecting post: %v", err)
+	}
+
+	if rowsAffected == 0 {
+		return nil, status.Errorf(codes.PermissionDenied, "it's unable to update this post")
+	}
+
+	_, errDel := s.Db.ExecContext(ctx, `DELETE FROM posts WHERE id = $1 AND user_id = $2`,
+		req.PostId, req.UserId)
+	if errDel != nil {
+		return nil, status.Errorf(codes.NotFound, "unable delete post: %v", errDel)
 	}
 
 	retStruct := proto.DeletePostResponse{
 		IsDelete: true,
-	}
-
-	if postId == 0 {
-		retStruct.IsDelete = false
 	}
 
 	return &retStruct, nil
