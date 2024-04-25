@@ -122,9 +122,11 @@ async def update_post_user(request: Request, post_id: int):
     except grpc.RpcError as e:
         msg = e.details()
         if e.code() == grpc.StatusCode.PERMISSION_DENIED:
-            msg = "access to thid post denied!"
+            msg = f"access to this post denied: {e.details()}"
         elif e.code() == grpc.StatusCode.INTERNAL:
-            msg = "error in grpc service"
+            msg = f"error in grpc service: {e.details()}"
+        else:
+            msg = f"such post from this user not found: {e.details()}"
         return JSONResponse({"message": msg}, status_code=400)
 
 @post_router.get("/get_post/{post_id}", status_code=200)

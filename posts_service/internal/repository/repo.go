@@ -65,7 +65,7 @@ func (s *GrpcServer) UpdatePost(ctx context.Context, r *proto.UpdatePostRequest)
 		}
 		rowsAffected, err := resUpd.RowsAffected()
 		if err != nil {
-			return nil, status.Errorf(codes.Internal, "errot in updating title post: %v", err)
+			return nil, status.Errorf(codes.NotFound, "errot in updating title post: %v", err)
 		}
 
 		if rowsAffected == 0 {
@@ -82,7 +82,7 @@ func (s *GrpcServer) UpdatePost(ctx context.Context, r *proto.UpdatePostRequest)
 		}
 		rowsAffected, err := resUpd.RowsAffected()
 		if err != nil {
-			return nil, status.Errorf(codes.Internal, "errot in updating content post: %v", err)
+			return nil, status.Errorf(codes.NotFound, "errot in updating content post: %v", err)
 		}
 
 		if rowsAffected == 0 {
@@ -92,7 +92,7 @@ func (s *GrpcServer) UpdatePost(ctx context.Context, r *proto.UpdatePostRequest)
 
 	var post proto.Post
 
-	errGet := s.Db.QueryRowContext(ctx, `SELECT id, title, text_description, post_time, user_id FROM posts WHERE id = $1`).Scan(
+	errGet := s.Db.QueryRowContext(ctx, `SELECT id, title, text_description, post_time, user_id FROM posts WHERE id = $1`, r.PostId).Scan(
 		&post.Id, &post.Title, &post.TextDescription, &post.PostTime, &post.UserId)
 
 	if errGet != nil {
