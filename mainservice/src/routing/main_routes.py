@@ -66,12 +66,25 @@ async def get_users():
 @main_router.put("/update", status_code=200)
 async def update_data_user(request: Request, _: UpdateUser):
     input_data = await request.body()
+    input_data = json.loads(input_data.decode("utf-8").replace("'",'"'))
+    
+    get_id = await Repository.get_user_token(input_data['token'])
+
+    if get_id <= 0:
+        return JSONResponse(content={"message": "invalid token, try again"}, status_code=401)
+    
+    check_token = await Repository.check_current_token(input_data['token'], get_id)
+
+    if not check_token:
+        return JSONResponse(content={"message": "your authorization was expired, try again"}, 
+                            status_code=401)
+    
     if not input_data:
         return JSONResponse(content={"message": "no data for update"}, status_code=401)
-    data_input = defaultdict(str, json.loads(input_data))
+    
     try:
-        await update_user(data_input)
+        value = await update_user(input_data)
     except ValueError as e:
         raise HTTPException(400, {"message": str(e)})
 
-    return JSONResponse(content={"message": "data succesfully updated"}, status_code=200)
+    return JSONResponse(content={"message": "data succesfully updated", "user_data": value}, status_code=200)
