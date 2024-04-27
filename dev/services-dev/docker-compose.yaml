@@ -1,0 +1,18 @@
+version: "3.5"
+
+services:
+  main_service:
+    container_name: "main_service"
+    restart: unless-stopped
+    build:
+      context: ./../../mainservice
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    networks:
+      - socnet-network
+
+
+networks:
+  socnet-network:
+    name: "socnet-network"
