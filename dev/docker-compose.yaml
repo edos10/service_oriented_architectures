@@ -9,6 +9,8 @@ services:
       dockerfile: ./mainservice/Dockerfile
     ports:
       - "5000:5000"
+    depends_on:
+      - postgresql
     networks:
       - socnet-network
   
@@ -20,6 +22,21 @@ services:
       dockerfile: ./posts_service/Dockerfile
     ports:
       - "5001:5001"
+    depends_on:
+      - postgresql
+    networks:
+      - socnet-network
+    
+  stat_service:
+    container_name: "stat_service"
+    restart: unless-stopped
+    build:
+      context: ./..
+      dockerfile: ./stat_service/Dockerfile
+    ports:
+      - "5002:5002"
+    depends_on:
+      - postgresql
     networks:
       - socnet-network
   
@@ -29,7 +46,7 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_PASSWORD: postgres
-      POSTGRES_MULTIPLE_DATABASES: main, posts
+      POSTGRES_MULTIPLE_DATABASES: main, posts, stat
     ports:
       - "5432:5432"
     networks:
@@ -63,8 +80,61 @@ services:
     volumes:
       - ./database-dev/configs/servers.json:/pgadmin4/servers.json:ro
       - ./database-dev/configs/pgpass:/pgadmin4/pgpass:ro
-
-
+  kafka:
+    container_name: "socnet-kafka"
+    image: confluentinc/cp-kafka:7.6.0
+    hostname: socnet-kafka
+    restart: unless-stopped
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://socnet-kafka:29092,PLAINTEXT_HOST://socnet-kafka:9092'
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@socnet-kafka:29093'
+      KAFKA_LISTENERS: 'PLAINTEXT://socnet-kafka:29092,CONTROLLER://socnet-kafka:29093,PLAINTEXT_HOST://0.0.0.0:9092'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+      CLUSTER_ID: 'MkU3OEVBNTcwNTJENDM2Qk'
+      KAFKA_ADVERTISED_HOST_NAME: 'socnet-kafka'
+      KAFKA_JMX_PORT: 9997
+    ports:
+      - "9092:9092"
+    networks:
+      - socnet-network
+  #kafka-ui:
+  #  container_name: "socnet-kafka-ui"
+  #  image: provectuslabs/kafka-ui
+  #  restart: unless-stopped
+  #  depends_on:
+  #    - kafka
+  #  environment:
+  #    KAFKA_CLUSTERS_0_NAME: 'socnet-kafka'
+  #    KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: 'socnet-kafka:29092'
+  #    KAFKA_CLUSTERS_0_METRICS_PORT: 9997
+  #    DYNAMIC_CONFIG_ENABLED: 'true'
+  #  ports:
+  #    - "8081:8080"
+  #  networks:
+  #    - socnet-network
+  init-kafka:
+    container_name: "socnet-init-kafka"
+    image: confluentinc/cp-kafka:7.6.0
+    depends_on:
+      - kafka
+    networks:
+      - socnet-network
+    entrypoint: ["/bin/sh", "-c"]
+    command: |
+      "
+      # blocks until kafka is reachable
+      kafka-topics --bootstrap-server socnet-kafka:29092 --list
+      echo -e 'Creating kafka topics'
+      kafka-topics --bootstrap-server socnet-kafka:29092 --create --if-not-exists --topic views --replication-factor 1 --partitions 1
+      kafka-topics --bootstrap-server socnet-kafka:29092 --create --if-not-exists --topic likes --replication-factor 1 --partitions 1
+      echo -e 'Successfully created the following topics:'
+      kafka-topics --bootstrap-server socnet-kafka:29092 --list
+      "
 
 networks:
   socnet-network:
