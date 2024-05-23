@@ -28,6 +28,7 @@ Rel(main_api, view_topic, "Отправляет события по лайкам
 Rel(view_topic, stat_service, "Принимает события по просмотрам/лайкам")
 Rel(stat_service, db_stat, "Отдает события по просмотрам/лайкам")
 Rel(main_api, db_main, "Обрабатывает и обновляет данные пользователей")
+Rel(posts_service, db_posts, "Обновляет информацию по постам и комментариям пользователей")
 Rel(main_api, db_token, "Проверяет токены аутентификации для авторизации пользователей")
 Rel(main_api, stat_service, "Получает статистику по сервисам", "gRPC")
 @enduml

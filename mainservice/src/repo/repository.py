@@ -18,8 +18,16 @@ class Repository:
         if len(value) == 0:
             return -1
         return value[0]['id']
+    
+    async def get_nick_on_id(user_id: int) -> int:
+        conn = await connection_start()
+        value = await conn.fetch(f"SELECT nickname FROM users WHERE id={user_id}")
+        await conn.close()
+        if len(value) == 0:
+            return -1
+        return value[0]['nickname']
 
-    async def get_user_token(self, token: str) -> int:
+    async def get_user_token(token: str) -> int:
         conn = await connection_start()
         value = await conn.fetch(f"SELECT id FROM tokens WHERE token='{token}'")
         await conn.close()
@@ -71,10 +79,19 @@ class Repository:
                          """)
         await conn.close()
 
-    async def check_current_token(self, token: str, user_id: int) -> bool:
+    async def check_current_token(token: str, user_id: int) -> bool:
         conn = await connection_start()
         tokens = await conn.fetch(f"SELECT * FROM tokens WHERE id={user_id} AND token='{token}'")
         await conn.close()
         if tokens[0]['end_time'] >= datetime.datetime.now():
             return True
         return False
+
+
+class RepositoryPost:
+    async def get_posts():
+        pass
+
+    async def get_post_on_id():
+        pass
+    

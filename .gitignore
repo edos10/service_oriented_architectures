@@ -156,3 +156,4 @@ liquibase.properties
 
 .idea
 .vscode
+out/

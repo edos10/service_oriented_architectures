@@ -1,0 +1,35 @@
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+        http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+
+    <changeSet author="e.ryabov" id="create-posts-table">
+        <createTable tableName="posts" remarks="Храним посты в posts">
+            <column name="id" type="SERIAL" remarks="Идентификатор поста">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="posts_pkey"/>
+            </column>
+
+            <column name="title" type="VARCHAR(100)" remarks="Заголовок поста">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="text_description" type="VARCHAR(50000)" remarks="Текст поста">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="user_id" type="INTEGER" remarks="id юзера, создавшего пост">
+            </column>
+
+            <column name="post_time" type="TIMESTAMP" remarks="время публикации поста">
+            </column>
+
+        </createTable>
+    </changeSet>
+    
+    
+</databaseChangeLog>

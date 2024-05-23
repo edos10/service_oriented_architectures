@@ -67,11 +67,11 @@ async def get_users():
 async def update_data_user(request: Request, _: UpdateUser):
     input_data = await request.body()
     if not input_data:
-        return JSONResponse(content={"message": "no data for update"}, status_code=400)
+        return JSONResponse(content={"message": "no data for update"}, status_code=401)
     data_input = defaultdict(str, json.loads(input_data))
     try:
         await update_user(data_input)
     except ValueError as e:
-        raise HTTPException(401, {"message": str(e)})
+        raise HTTPException(400, {"message": str(e)})
 
     return JSONResponse(content={"message": "data succesfully updated"}, status_code=200)

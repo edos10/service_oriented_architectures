@@ -94,6 +94,52 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+  /create_post:
+    post:
+      summary: Create New Post
+      operationId: create_new_post_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewPost'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseNewPost'
+        '400':
+          description: Bad request, errors in data or expired token
+        '500':
+          description: Error in create user
+  /update_post:
+    put:
+      summary: Update Post on ID
+      operationId: update_post_put
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePost'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseUpdatePost'
+        '400':
+          description: Bad request, errors in data or expired token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseUpdatePostError'
+        '500':
+          description: Error in update user
 components:
   schemas:
     AuthUser:
@@ -298,3 +344,4 @@ components:
         - msg
         - type
       title: ValidationError
+  

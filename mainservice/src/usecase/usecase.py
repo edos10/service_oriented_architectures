@@ -79,11 +79,11 @@ async def update_user(data: defaultdict):
     if 'birth_date' in data and not await preprocess_date(data['birth_date']):
         raise ValueError("wrong birth date!")
 
-    id_user = await Repository().get_user_token(data["token"])
+    id_user = await Repository.get_user_token(data["token"])
 
     if id_user <= 0:
         raise ValueError("such token doesn't exists")
 
-    if not await Repository().check_current_token(data["token"], id_user):
+    if not await Repository.check_current_token(data["token"], id_user):
         raise ValueError("life-time of token ended, try auth again!")
-    await Repository().update_user(id_user, data)
+    await Repository.update_user(id_user, data)

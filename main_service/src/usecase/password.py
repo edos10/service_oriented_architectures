@@ -3,7 +3,7 @@ import random
 import string
 
 
-symbols_for_pwd = string.ascii_letters + string.digits
+symbols_for_pwd = string.ascii_letters + string.digits + string.punctuation
 
 
 def gen_token() -> str:
@@ -16,4 +16,4 @@ def hash_password(pwd: str) -> bytes:
 
 
 def check_password(hash_str: bytes, password: str) -> bool:
-    return bcrypt.checkpw(password.encode(), hash_str)
+    return bcrypt.checkpw(password.encode(), bytes(hash_str))
