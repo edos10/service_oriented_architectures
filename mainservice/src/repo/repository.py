@@ -65,12 +65,24 @@ class Repository:
         await conn.close()
         return new_id[0]['id']
 
-    async def update_user(self, user_id: int, data: dict) -> None:
+    async def update_user(user_id: int, data: dict) -> dict:
         conn = await connection_start()
         data.pop("token")
         for i, v in data.items():
-            await conn.fetch(f"""UPDATE users SET {i}='{v}'""")
+            await conn.fetch(f"""UPDATE users SET {i}='{v}' WHERE id = $1""", user_id)
+        value = await conn.fetch(f"SELECT * from users WHERE id = $1", user_id)
+        if not value:
+            raise ValueError("error in database in selecting this user!")
         await conn.close()
+        user = value[0]
+        return {
+            "email": user['email'],
+            "name": user['name'],
+            "surname": user['surname'],
+            "nickname": user['nickname'],
+            "phone_number": user['phone_number'],
+            "birth_date": user['birth_date']
+        }
 
     async def new_token(self, token: str, user_id: int, end_time) -> None:
         conn = await connection_start()

@@ -86,4 +86,4 @@ async def update_user(data: defaultdict):
 
     if not await Repository.check_current_token(data["token"], id_user):
         raise ValueError("life-time of token ended, try auth again!")
-    await Repository.update_user(id_user, data)
+    return await Repository.update_user(id_user, data)
