@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package stat_service;
+
+option go_package = "./proto";
+
+service StatService {
+    rpc GetStatPost(GetStatPostRequest) returns (StatPostResponse);
+    rpc GetTop5Posts(GetTop5PostsRequest) returns (GetTop5PostsResponse);
+    rpc GetTopNUsers(GetTopNUsersRequest) returns (GetTopNUsersResponse);
+}
+
+message GetStatPostRequest {
+    int64 Post_id = 1;
+}
+
+message GetTop5PostsRequest {
+    bool Is_views = 1;
+}
+
+message GetTopNUsersRequest {
+    int64 Post_id = 1;
+    int64 User_id = 2;
+}
+
+message StatPostResponse {
+    int64 Post_id = 1;
+    int64 Likes = 2;
+    int64 Views = 3;
+}
+
+message GetTop5PostsResponse {
+    repeated Post Posts = 1;
+}
+
+message GetTopNUsersResponse {
+    repeated UserStat Users = 1;
+}
+
+message Post {
+    int64 Id = 1;
+    string Title = 2;
+    int64 User_id = 3;
+    string Text_description = 4;
+    string Post_time = 5;
+}
+
+message UserStat {
+    int64 Total_likes = 1;
+    int64 Total_views = 2;
+}

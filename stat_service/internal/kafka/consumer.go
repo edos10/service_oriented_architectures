@@ -28,7 +28,7 @@ func NewKafkaConsumer(brokers []string, topic string, db *sql.DB) *KafkaConsumer
 
 func (k *KafkaConsumer) ConsumeViews() {
 	reader := kafka.NewReader(kafka.ReaderConfig{
-		Brokers:        []string{"socnet-kafka:29092"},
+		Brokers:        []string{"socnet-kafka:9092"},
 		Topic:          "views",
 		SessionTimeout: time.Second * 6,
 	})

@@ -81,7 +81,7 @@ class Repository:
             "surname": user['surname'],
             "nickname": user['nickname'],
             "phone_number": user['phone_number'],
-            "birth_date": user['birth_date']
+            "birth_date": datetime.datetime.strftime(user['birth_date'], '%Y-%m-%d')
         }
 
     async def new_token(self, token: str, user_id: int, end_time) -> None:
