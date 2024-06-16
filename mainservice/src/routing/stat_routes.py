@@ -63,12 +63,13 @@ async def new_like(request: Request, post_id: int):
 @stat_router.get('/stats_post/{post_id}', status_code=200)
 async def get_stats_post(request: Request, post_id: int):
     try:
-        client = await grpc_connect()
+        client = await grpc_connect("stat")
         response = client.GetStatPost(
             stat_service_pb2.GetStatPostRequest(Post_id=post_id))
         return JSONResponse(content={
             "likes": response.Likes,
             "views": response.Views,
+            "id": response.Post_id
         }, status_code=200)
     except grpc.RpcError as e:
         msg = e.details()
@@ -81,7 +82,20 @@ async def get_stats_post(request: Request, post_id: int):
 
 @stat_router.get('/top3_users_like', status_code=200)
 async def get_stats_post(request: Request):
-    pass
+    try:
+        client = await grpc_connect("stat")
+        response = client.GetTopNUsers(
+            stat_service_pb2.GetTopNUsersRequest(Top_N=3))
+        return JSONResponse(content={
+            "users": response.Users,
+        }, status_code=200)
+    except grpc.RpcError as e:
+        msg = e.details()
+        if e.code() == grpc.StatusCode.PERMISSION_DENIED:
+            msg = "access to this post denied!"
+        elif e.code() == grpc.StatusCode.INTERNAL:
+            msg = "error in grpc service"
+        return JSONResponse({"message": msg}, status_code=400)
 
 
 @stat_router.get('/top5_posts_on_stat', status_code=200)

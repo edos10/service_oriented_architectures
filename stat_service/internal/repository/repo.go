@@ -52,3 +52,30 @@ func (s *GrpcServer) GetStatPost(ctx context.Context, req *proto.GetStatPostRequ
 
 	return &proto.StatPostResponse{PostId: postId, Likes: likes, Views: views}, nil
 }
+
+func (s *GrpcServer) GetTopNUsers(ctx context.Context, req *proto.GetTopNUsersRequest) (*proto.GetTopNUsersResponse, error) {
+	CreateDatabaseConnect("posts")
+	query_like := "SELECT user_id, COUNT(*) as total_likes FROM likes GROUP BY user_id LIMIT $1"
+	rows, err := s.Db.QueryContext(ctx, query_like, req.Top_N)
+	if err != nil {
+		log.Printf("Error fetching top N users: %v", err)
+		return nil, status.Errorf(codes.Internal, "Error fetching top N users")
+	}
+	defer rows.Close()
+
+	var users []*proto.UserStat
+	for rows.Next() {
+		var user proto.UserStat
+		if err := rows.Scan(&user.UserId, &user.TotalLikes); err != nil {
+			log.Printf("Error scanning user row: %v", err)
+			continue
+		}
+		users = append(users, &user)
+	}
+	if err := rows.Err(); err != nil {
+		log.Printf("Error iterating over user rows: %v", err)
+		return nil, status.Errorf(codes.Internal, "Error iterating over user rows")
+	}
+
+	return &proto.GetTopNUsersResponse{Users: users}, nil
+}

@@ -19,8 +19,7 @@ message GetTop5PostsRequest {
 }
 
 message GetTopNUsersRequest {
-    int64 Post_id = 1;
-    int64 User_id = 2;
+    int64 Top_N = 1;
 }
 
 message StatPostResponse {

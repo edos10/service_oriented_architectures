@@ -36,7 +36,7 @@ async def create_post(request: Request):
         return JSONResponse(content={"message": "your authorization was expired, try again"}, status_code=400)
     
     try:
-        client = await grpc_connect()
+        client = await grpc_connect("post")
         response = client.CreatePost(
             posts_service_pb2.CreatePostRequest(Title=input_data['title'], 
                                                Text_description=input_data['text_description'],
@@ -70,7 +70,7 @@ async def delete_post(request: Request, post_id: int):
                             status_code=401)
     
     try:
-        client = await grpc_connect()
+        client = await grpc_connect("post")
         client.DeletePost(
             posts_service_pb2.DeletePostRequest(Post_id=post_id,
                                                 User_id=get_id))
@@ -100,7 +100,7 @@ async def update_post_user(request: Request, post_id: int):
         return JSONResponse(content={"message": "your authorization was expired, try again"}, status_code=400)
     
     try:
-        client = await grpc_connect()
+        client = await grpc_connect("post")
         response = client.UpdatePost(
             posts_service_pb2.UpdatePostRequest(Post_id=post_id,
                                                 Title=input_data['title'],
@@ -145,7 +145,7 @@ async def get_post_on_id(request: Request, post_id: int):
     
 
     try:
-        client = await grpc_connect()
+        client = await grpc_connect("post")
         response = client.GetPostOnId(
             posts_service_pb2.GetPostOnIdRequest(Post_id=post_id,))
         
@@ -183,7 +183,7 @@ async def get_all_posts_with_pagination(request: Request):
         return JSONResponse(content={"message": "invalid input data"}, status_code=400)
 
     try:
-        client = await grpc_connect()
+        client = await grpc_connect("post")
         response = client.GetPostsOnPagination(
             posts_service_pb2.GetPostPageRequest(Num_page=input_data['page_number'], 
                                                Count_on_page=input_data['count_on_page'],))
