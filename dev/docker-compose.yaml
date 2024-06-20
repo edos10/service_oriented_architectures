@@ -102,21 +102,21 @@ services:
       - "9092:9092"
     networks:
       - socnet-network
-  #kafka-ui:
-  #  container_name: "socnet-kafka-ui"
-  #  image: provectuslabs/kafka-ui
-  #  restart: unless-stopped
-  #  depends_on:
-  #    - kafka
-  #  environment:
-  #    KAFKA_CLUSTERS_0_NAME: 'socnet-kafka'
-  #    KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: 'socnet-kafka:29092'
-  #    KAFKA_CLUSTERS_0_METRICS_PORT: 9997
-  #    DYNAMIC_CONFIG_ENABLED: 'true'
-  #  ports:
-  #    - "8081:8080"
-  #  networks:
-  #    - socnet-network
+  kafka-ui:
+    container_name: "socnet-kafka-ui"
+    image: provectuslabs/kafka-ui
+    restart: unless-stopped
+    depends_on:
+      - kafka
+    environment:
+      KAFKA_CLUSTERS_0_NAME: 'socnet-kafka'
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: 'socnet-kafka:29092'
+      KAFKA_CLUSTERS_0_METRICS_PORT: 9997
+      DYNAMIC_CONFIG_ENABLED: 'true'
+    ports:
+      - "8081:8080"
+    networks:
+      - socnet-network
   init-kafka:
     container_name: "socnet-init-kafka"
     image: confluentinc/cp-kafka:7.6.0

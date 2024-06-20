@@ -3,26 +3,26 @@ package app
 import (
 	"context"
 	"fmt"
-	"net/http"
+	"log"
+	"net"
+	"stat_service/internal/config"
 	"stat_service/internal/kafka"
 	"stat_service/internal/repository"
-
-	"stat_service/internal/config"
+	"stat_service/proto"
 
 	"go.uber.org/zap"
+	"google.golang.org/grpc"
 )
 
 type AppServer struct {
 	cfg                *config.Config
-	server             *http.Server
+	server             *repository.GrpcServer
 	kafkaConsumerLikes *kafka.KafkaConsumer
 	kafkaConsumerViews *kafka.KafkaConsumer
 	logger             *zap.Logger
 }
 
 func NewAppServer(cfg *config.Config, logger *zap.Logger) *AppServer {
-	address := fmt.Sprintf(":%d", cfg.Http.Port)
-
 	viewsDb, errCreate := repository.CreateDatabaseConnect("stat")
 	likesDb, err := repository.CreateDatabaseConnect("stat")
 
@@ -30,14 +30,18 @@ func NewAppServer(cfg *config.Config, logger *zap.Logger) *AppServer {
 		fmt.Println(err, errCreate)
 	}
 
-	consumeLikes := kafka.NewKafkaConsumer([]string{"127.0.0.1:29092"}, "likes", likesDb)
-	consumeViews := kafka.NewKafkaConsumer([]string{"127.0.0.1:29092"}, "views", viewsDb)
+	consumeLikes := kafka.NewKafkaConsumer([]string{"127.0.0.1:9092"}, "likes", likesDb)
+	consumeViews := kafka.NewKafkaConsumer([]string{"127.0.0.1:9092"}, "views", viewsDb)
+
+	db, err := repository.CreateDatabaseConnect("stat")
+	if err != nil {
+		panic("unable to connect with db...")
+	}
 
 	a := &AppServer{
 		cfg: cfg,
-		server: &http.Server{
-			Addr: address,
-			//	Handler: initApi(cfg, kafkaProducer, logger),
+		server: &repository.GrpcServer{
+			Db: db,
 		},
 		kafkaConsumerLikes: consumeLikes,
 		kafkaConsumerViews: consumeViews,
@@ -57,9 +61,15 @@ func (a *AppServer) Run() {
 	}()
 
 	go func() {
-		err := a.server.ListenAndServe()
+		s := grpc.NewServer()
+		proto.RegisterStatServiceServer(s, a.server)
+		port, err := net.Listen("tcp", ":81")
 		if err != nil {
-			a.logger.Error("Failed to start HTTP server", zap.Error(err))
+			log.Fatalf("failed to listen: %v", err)
+		}
+		err = s.Serve(port)
+		if err != nil {
+			a.logger.Error("Failed to start grpc server", zap.Error(err))
 		}
 	}()
 }
@@ -67,10 +77,4 @@ func (a *AppServer) Run() {
 func (a *AppServer) Stop(ctx context.Context) {
 	a.kafkaConsumerLikes.Close()
 	a.kafkaConsumerViews.Close()
-	err := a.server.Shutdown(ctx)
-	if err != nil {
-		a.logger.Error("Error shutting down server", zap.Error(err))
-	} else {
-		a.logger.Info("Server shutdown successfully")
-	}
 }
