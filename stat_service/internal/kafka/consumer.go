@@ -98,12 +98,12 @@ func (k *KafkaConsumer) Close() {
 
 func (k *KafkaConsumer) writeToPostgresView(event model.NewView) error {
 	_, err := k.database.Exec(
-		fmt.Sprintf(`INSERT INTO views (post_time, user_id, post_id) VALUES ('%s', %d, %d)`, event.Time, event.UserId, event.PostId))
+		fmt.Sprintf(`INSERT INTO views (post_time, user_id, post_id, author) VALUES ('%s', %d, %d, %d)`, event.Time, event.UserId, event.PostId, event.Author))
 	return err
 }
 
 func (k *KafkaConsumer) writeToPostgresLike(event model.NewLike) error {
 	_, err := k.database.Exec(
-		fmt.Sprintf(`INSERT INTO likes (post_time, user_id, post_id) VALUES ('%s', %d, %d)`, event.Time, event.UserId, event.PostId))
+		fmt.Sprintf(`INSERT INTO likes (post_time, user_id, post_id, author) VALUES ('%s', %d, %d, %d)`, event.Time, event.UserId, event.PostId, event.Author))
 	return err
 }

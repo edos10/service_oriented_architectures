@@ -6,7 +6,7 @@ option go_package = "./proto";
 
 service StatService {
     rpc GetStatPost(GetStatPostRequest) returns (StatPostResponse);
-    rpc GetTop5Posts(GetTop5PostsRequest) returns (GetTop5PostsResponse);
+    rpc GetTopPosts(GetTopPostsRequest) returns (GetTopPostsResponse);
     rpc GetTopNUsers(GetTopNUsersRequest) returns (GetTopNUsersResponse);
 }
 
@@ -14,8 +14,8 @@ message GetStatPostRequest {
     int64 Post_id = 1;
 }
 
-message GetTop5PostsRequest {
-    bool Is_views = 1;
+message GetTopPostsRequest {
+    bool Views = 1;
 }
 
 message GetTopNUsersRequest {
@@ -28,12 +28,12 @@ message StatPostResponse {
     int64 Views = 3;
 }
 
-message GetTop5PostsResponse {
-    repeated Post Posts = 1;
+message GetTopPostsResponse {
+    repeated AbstractStatPost Posts = 1;
 }
 
 message GetTopNUsersResponse {
-    repeated UserStat Users = 1;
+    repeated TopUsersLikes Users = 1;
 }
 
 message Post {
@@ -44,7 +44,13 @@ message Post {
     string Post_time = 5;
 }
 
-message UserStat {
-    int64 Total_likes = 1;
-    int64 Total_views = 2;
+message TopUsersLikes {
+    int64 User_id = 1;
+    int64 Total_likes = 2;
+}
+
+message AbstractStatPost {
+    int64 Amount = 1;
+    int64 Id = 2;
+    int64 Author = 3;
 }

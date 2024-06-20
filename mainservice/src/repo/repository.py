@@ -11,7 +11,7 @@ class Repository:
         await conn.close()
         return values
 
-    async def get_user_nick(self, nick: str) -> int:
+    async def get_user_nick(nick: str) -> int:
         conn = await connection_start()
         value = await conn.fetch(f"SELECT id FROM users WHERE nickname='{nick}'")
         await conn.close()
@@ -19,12 +19,12 @@ class Repository:
             return -1
         return value[0]['id']
     
-    async def get_nick_on_id(user_id: int) -> int:
+    async def get_nick_on_id(user_id: int) -> str:
         conn = await connection_start()
         value = await conn.fetch(f"SELECT nickname FROM users WHERE id={user_id}")
         await conn.close()
         if len(value) == 0:
-            return -1
+            return ""
         return value[0]['nickname']
 
     async def get_user_token(token: str) -> int:
@@ -104,6 +104,11 @@ class RepositoryPost:
     async def get_posts():
         pass
 
-    async def get_post_on_id():
-        pass
-    
+    async def get_post_on_id(id: int):
+        conn = await connection_start()
+        tokens = await conn.fetch(f"SELECT * FROM posts WHERE id={id}")
+        await conn.close()
+        if len(tokens):
+            return True
+        return False
+        

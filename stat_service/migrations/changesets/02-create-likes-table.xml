@@ -18,6 +18,10 @@
                 <constraints nullable="false"/>
             </column>
 
+            <column name="author" type="INTEGER" remarks="ID автора">
+                <constraints nullable="false"/>
+            </column>
+
             <column name="user_id" type="INTEGER" remarks="ID юзера">
                 <constraints nullable="false"/>
             </column>

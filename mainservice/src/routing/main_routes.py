@@ -49,7 +49,7 @@ async def auth_user(request: Request, _: AuthUser):
 
     token = gen_token()
 
-    get_id = await Repository().get_user_nick(data_input['nickname'])
+    get_id = await Repository.get_user_nick(data_input['nickname'])
 
     await add_token(get_id, token)
 
@@ -65,8 +65,9 @@ async def get_users():
 
 @main_router.put("/update", status_code=200)
 async def update_data_user(request: Request, _: UpdateUser):
-    input_data = await request.body()
-    input_data = json.loads(input_data.decode("utf-8").replace("'",'"'))
+    input_data = request.headers
+    if 'token' not in input_data:
+        return JSONResponse(content={"message": "not autorized, required token, try authorize"}, status_code=401)
     
     get_id = await Repository.get_user_token(input_data['token'])
 

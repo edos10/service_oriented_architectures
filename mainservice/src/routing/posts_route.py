@@ -19,18 +19,20 @@ post_router = APIRouter()
 async def create_post(request: Request):
     input_data = await request.body()
     input_data = json.loads(input_data.decode("utf-8").replace("'",'"'))
+    if 'token' not in request.headers:
+        return JSONResponse(content={"message": "not autorized, required token, try authorize"}, status_code=401)
 
     if 'title' not in input_data or 'text_description' not in input_data:
         return JSONResponse(content={"message": "invalid input data"}, status_code=400)
     
 
     # вынести в usecase
-    get_id = await Repository.get_user_token(input_data['token'])
+    get_id = await Repository.get_user_token(request.headers['token'])
 
     if get_id <= 0:
         return JSONResponse(content={"message": "invalid token, try again"}, status_code=400)
     
-    check_token = await Repository.check_current_token(input_data['token'], get_id)
+    check_token = await Repository.check_current_token(request.headers['token'], get_id)
 
     if not check_token:
         return JSONResponse(content={"message": "your authorization was expired, try again"}, status_code=400)
@@ -56,14 +58,15 @@ async def create_post(request: Request):
 @post_router.post("/delete_post/{post_id}", status_code=204)
 async def delete_post(request: Request, post_id: int):
     input_data = await request.body()
-    input_data = json.loads(input_data.decode("utf-8").replace("'",'"'))
+    if 'token' not in request.headers:
+        return JSONResponse(content={"message": "not autorized, required token, try authorize"}, status_code=401)
     
-    get_id = await Repository.get_user_token(input_data['token'])
+    get_id = await Repository.get_user_token(request.headers['token'])
 
     if get_id <= 0:
         return JSONResponse(content={"message": "invalid token, try again"}, status_code=401)
     
-    check_token = await Repository.check_current_token(input_data['token'], get_id)
+    check_token = await Repository.check_current_token(request.headers['token'], get_id)
 
     if not check_token:
         return JSONResponse(content={"message": "your authorization was expired, try again"}, 
@@ -88,14 +91,15 @@ async def delete_post(request: Request, post_id: int):
 async def update_post_user(request: Request, post_id: int):
     input_data = await request.body()
     input_data = json.loads(input_data.decode("utf-8").replace("'",'"'))
-    input_data = defaultdict(str, input_data)
+    if 'token' not in request.headers:
+        return JSONResponse(content={"message": "not autorized, required token, try authorize"}, status_code=401)
 
-    get_id = await Repository.get_user_token(input_data['token'])
+    get_id = await Repository.get_user_token(request.headers['token'])
 
     if get_id <= 0:
         return JSONResponse(content={"message": "invalid token, try again"}, status_code=400)
     
-    check_token = await Repository.check_current_token(input_data['token'], get_id)
+    check_token = await Repository.check_current_token(request.headers['token'], get_id)
     if not check_token:
         return JSONResponse(content={"message": "your authorization was expired, try again"}, status_code=400)
     
@@ -131,8 +135,9 @@ async def update_post_user(request: Request, post_id: int):
 
 @post_router.get("/get_post/{post_id}", status_code=200)
 async def get_post_on_id(request: Request, post_id: int):
-    input_data = await request.body()
-    input_data = json.loads(input_data.decode("utf-8").replace("'",'"'))
+    input_data = request.headers
+    if 'token' not in request.headers:
+        return JSONResponse(content={"message": "not autorized, required token, try authorize"}, status_code=401)
 
     get_id = await Repository.get_user_token(input_data['token'])
 
@@ -165,9 +170,10 @@ async def get_post_on_id(request: Request, post_id: int):
 
 @post_router.get("/get_post", status_code=200)
 async def get_all_posts_with_pagination(request: Request):
-    input_data = await request.body()
-    input_data = json.loads(input_data.decode("utf-8").replace("'",'"'))
-
+    input_data = request.headers
+    if 'token' not in input_data:
+        return JSONResponse(content={"message": "not autorized, required token, try authorize"}, status_code=401)
+    
     get_id = await Repository.get_user_token(input_data['token'])
 
     if get_id <= 0:
